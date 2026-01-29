@@ -163,53 +163,97 @@ interface AuthState {
 ### 💳 ACCOUNT - Gestión de Cuentas
 
 **ID**: `account`  
-**Propósito**: Consulta y actualización de información de cuentas de clientes  
+**Propósito**: Exponer operaciones de consulta y edición de cuentas de crédito para los equipos de servicio y operación, asegurando que los datos financieros y de clientes estén enmascarados, validados y sincronizados con el backend transaccional.  
 **Componentes Clave**:
-- `AccountViewScreen.tsx` - Visualización de detalles de cuenta
-- `AccountUpdateScreen.tsx` - Actualización de información de cuenta
-- `AccountViewPage.tsx` - Página de consulta
-- `AccountUpdatePage.tsx` - Página de actualización
+- `AccountViewScreen.tsx` & `AccountUpdateScreen.tsx` – Formularios MUI con SystemHeader, validaciones inline y tarjetas de información financiera/cliente.
+- `AccountViewPage.tsx` & `AccountUpdatePage.tsx` – Páginas que supervisan la autenticación (token + rol) y conectan los hooks.
+- `useAccountView` & `useAccountUpdate` – Hooks que orquestan llamadas a `apiClient`, detección de cambios, estados de loading/error y guards de validación.
 
 **APIs Públicas**:
-- `GET /api/account/acccount` - Consulta de cuenta por ID
-- `PUT /api/account/update` - Actualización de información de cuenta
+- `GET /account-view?accountId={11-digit}` – Busca datos consolidados de Account + Customer; usado desde `useAccountView` (incluye parsing del ID y enmascarado opcional).
+- `GET /account-view/initialize` – Bootstraps la pantalla de consulta con metadatos (fecha, hora, transactionId) para evitar pantallas vacías.
+- `GET /accounts/{accountId}` – Carga los datos completos que alimentan el `AccountUpdateScreen` (formato `AccountUpdateData`).
+- `PUT /accounts/{accountId}` – Envia `AccountUpdateData` para persistir cambios en Account y Customer desde el backend transaccional.
 
-**Tipos de Datos**:
+**Tipos de Datos (simplificado)**:
 ```typescript
-interface Account {
-  accountId: string;
-  balance: number;
-  creditLimit: number;
-  availableCredit: number;
-  status: string;
-  groupId: string;
-  customer: Customer;
-  cards: CreditCard[];
+interface AccountViewResponse {
+  currentDate: string;
+  currentTime: string;
+  transactionId: string;
+  programName: string;
+  accountId?: number;
+  accountStatus?: string; // 'Y' | 'N'
+  currentBalance?: number;
+  creditLimit?: number;
+  cashCreditLimit?: number;
+  currentCycleCredit?: number;
+  currentCycleDebit?: number;
+  openDate?: string;
+  expirationDate?: string;
+  reissueDate?: string;
+  groupId?: string;
+  customerId?: number;
+  customerSsn?: string;
+  ficoScore?: number;
+  firstName?: string;
+  middleName?: string;
+  lastName?: string;
+  addressLine1?: string;
+  state?: string;
+  zipCode?: string;
+  country?: string;
+  phoneNumber1?: string;
+  phoneNumber2?: string;
+  governmentId?: string;
+  eftAccountId?: string;
+  primaryCardHolderFlag?: string;
+  cardNumber?: string;
+  errorMessage?: string;
+  infoMessage?: string;
+  inputValid: boolean;
 }
 
-interface Customer {
-  customerId: string;
+interface AccountUpdateData {
+  accountId: number;
+  activeStatus: string;
+  creditLimit: number;
+  cashCreditLimit: number;
+  openDate: string;
+  expirationDate: string;
+  reissueDate: string;
+  currentCycleCredit: number;
+  currentCycleDebit: number;
+  groupId: string;
+  customerId: number;
   firstName: string;
-  middleName: string;
+  middleName?: string;
   lastName: string;
-  ssn: string;
+  addressLine1: string;
+  stateCode: string;
+  countryCode: string;
+  zipCode: string;
+  phoneNumber1: string;
   ficoScore: number;
-  address: Address;
-  phones: Phone[];
+  ssn: string;
+  governmentIssuedId: string;
+  primaryCardIndicator: string;
 }
 ```
 
 **Reglas de Negocio**:
-- El accountId debe tener exactamente 11 dígitos
-- El balance puede ser negativo (sobregiro)
-- El crédito disponible = creditLimit - balance
-- Solo cuentas activas (status='Y') pueden realizar transacciones
-- Cada cuenta tiene al menos un cliente asociado
+- Account ID debe ser un número no nulo de exactamente 11 dígitos (`AccountViewScreen` valida regex y rechaza `00000000000`).
+- `activeStatus` solo admite `Y`/`N`; `AccountUpdateScreen` bloquea valores inválidos mediante validación local.
+- SSN y número de tarjeta se muestran enmascarados por defecto, solo al habilitar `showSensitiveData` se muestran completos en la UI.
+- Actualizaciones (PUT `/accounts/{id}`) son transaccionales y actualizan `Account` + `Customer` a la vez; el hook resetea `hasChanges` cuando el backend responde `success`.
+- El módulo solo acepta cambios cuando el `editMode` está activado y no quedan errores de validación (`isNaN`, `ZIP`, etc.).
 
 **Ejemplos de User Stories**:
-- Como usuario back-office, quiero consultar los detalles de una cuenta para ver el saldo y límite de crédito
-- Como usuario back-office, quiero actualizar la información de un cliente para mantener los datos actualizados
-- Como usuario, quiero ver todas las tarjetas asociadas a una cuenta para gestionar los plásticos
+- Como representante de servicio al cliente, quiero buscar una cuenta por su ID de 11 dígitos para revisar saldo, límite y datos del cliente antes de responder consultas.
+- Como administrador de cuentas, quiero activar el modo edición y modificar límites o datos personales, confirmando los cambios en el diálogo antes de guardar.
+- Como oficial de cumplimiento, quiero que los SSN y números de tarjeta estén enmascarados por defecto y solo se revelen cuando el usuario lo solicita para cumplir con PCI-DSS.
+
+**Referencia extendida**: `modules/account/account-overview.md` (doc adicional con reglas, patrones y guías reales).
 
 ---
 

@@ -4,6 +4,9 @@
 
 ```
 docs/
+├── modules/
+│   └── account/
+│       └── account-overview.md     # 📚 Overview en markdown para Accounts
 ├── system-overview.md              # 🎯 Single source of truth (98% accuracy)
 └── site/
     ├── index.html                  # 🏠 Main navigable page
@@ -30,6 +33,10 @@ cat docs/system-overview.md
 
 # Or use your favorite markdown viewer
 code docs/system-overview.md
+```
+```bash
+# Review the module-specific overview (markdown)
+cat docs/modules/account/account-overview.md
 ```
 
 ## 📖 What's Included
@@ -61,6 +68,7 @@ Comprehensive development guide with:
 - Technical foundation (components, services, entities)
 - Performance considerations
 - Risk mitigation strategies
+- Markdown para Product Owners: `docs/modules/account/account-overview.md` resume reglas, APIs y historias enlazadas.
 
 ## 🎯 Key Features
 

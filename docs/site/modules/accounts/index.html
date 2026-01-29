@@ -118,6 +118,19 @@
         </section>
 
         <section class="section">
+            <h2>🔁 Hooks y flujo de navegación</h2>
+            <p><strong>AccountViewPage</strong> y <strong>AccountUpdatePage</strong> son responsables de validar `userRole` (almacenado en <code>localStorage</code>) antes de permitir el acceso y de redirigir a `/menu/admin` o `/menu/main` durante la salida.</p>
+            <p><strong>useAccountView</strong> ejecuta dos llamadas: una búsqueda GET a <code>/account-view?accountId=...</code> con padding de 11 dígitos y otra a <code>/account-view/initialize</code> para evitar una pantalla vacía en modo demo. Ambos resultados actualizan el estado local (`data`, `loading`, `error`).</p>
+            <p><strong>useAccountUpdate</strong> expone mutaciones para buscar (`GET /accounts/{accountId}`) y guardar (`PUT /accounts/{accountId}`) los datos. Internamente detecta cambios con <code>JSON.stringify</code>, reinicia estados al completar y sólo habilita el guardado cuando <code>hasChanges</code> es verdadero y no hay errores.</p>
+            <ul style="line-height: 2;">
+                <li>El hook usa <code>useMutation</code> personalizado y el singleton <code>apiClient</code> que agrega encabezados, timeout y loguea respuestas reales vs. MSW.</li>
+                <li>Las pantallas reutilizan componentes comunes: <code>SystemHeader</code> (transacciones <code>COACTVWC</code>/<code>COACTUPC</code>) y <code>LoadingSpinner</code>.</li>
+                <li>El flujo de navegación respeta shortcuts: F3 = exit, F5 = guardar, F12 = reset, manteniendo coherencia con otras pantallas del sistema.</li>
+            </ul>
+            <p>El `AccountUpdateScreen` sólo habilita el botón de guardado cuando el modo edición está activo y la validación local (`activeStatus`, `ZIP`, valores numéricos) no reporta errores.</p>
+        </section>
+
+        <section class="section">
             <h2>🎯 Guía de Desarrollo de Historias de Usuario</h2>
             
             <h3>📝 Templates de US Específicos</h3>
@@ -473,6 +486,11 @@ public class AccountUpdateService {
                     <tr><td>SSN</td><td>Enmascarado</td><td>***-**-XXXX en vista</td></tr>
                 </tbody>
             </table>
+        </section>
+
+        <section class="section">
+            <h2>📚 Referencias adicionales</h2>
+            <p>Para los detalles narrativos, reglas de negocio y patrones explícitos que alimentan nuevas User Stories, revisa <code>modules/account/account-overview.md</code> (Markdown plano con visión de negocio y técnica complementaria).</p>
         </section>
 
         <footer>
