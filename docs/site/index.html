@@ -167,6 +167,32 @@
         .module-card .link:hover {
             background: #5568d3;
         }
+        .callout {
+            background: #e0f2fe;
+            border-radius: 12px;
+            padding: 22px;
+            margin: 2rem 0;
+            border-left: 6px solid #0284c7;
+            box-shadow: 0 8px 16px rgba(8, 145, 178, 0.1);
+        }
+        .callout h2 {
+            color: #0369a1;
+            margin-bottom: 0.5rem;
+            font-size: 1.6rem;
+        }
+        .callout p {
+            margin-bottom: 12px;
+        }
+        .callout-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .callout-links a {
+            font-weight: 600;
+            color: #0369a1;
+            text-decoration: none;
+        }
         
         .tech-stack {
             background: white;
@@ -360,7 +386,7 @@
                     <li>Visualización de tarjetas asociadas</li>
                     <li>Cálculo de crédito disponible</li>
                 </ul>
-                <a href="../system-overview.md#-account---gestión-de-cuentas" class="link">Ver Detalles →</a>
+                <a href="modules/account/index.html" class="link">Ver Detalles →</a>
             </div>
 
             <div class="module-card">
@@ -445,6 +471,15 @@
                     <li>Diseño responsive</li>
                 </ul>
                 <a href="../system-overview.md#-layout---estructura-de-páginas" class="link">Ver Detalles →</a>
+            </div>
+        </section>
+
+        <section class="callout">
+            <h2>📁 Nueva documentación de ACCOUNT</h2>
+            <p>La guía del módulo ACCOUNT ya sigue el TEMPLATE_DOC con una versión Markdown (modules/account/account-overview.md) y una página HTML enriquecida con patrones, reglas, APIs y riesgos.</p>
+            <div class="callout-links">
+                <a href="modules/account/index.html">Abrir la guía HTML</a>
+                <a href="../modules/account/account-overview.md">Leer el overview Markdown</a>
             </div>
         </section>
 
